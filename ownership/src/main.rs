@@ -88,6 +88,20 @@ fn main() {
   // - Ownership can be transferred by moves, which happen on assignments and function calls.
   // - Heap data can only be accessed through its current owner, not a previous owner.
 
+  // References: a way in Rust to share pointer in different places without changing
+  // actual ownership of the data.
+  let m1 = String::from("Hello");
+  let m2 = String::from("World");
+  greet(&m1, &m2); // immutable references to m1 and m2 respectively
+  println!("m1: {m1}, m2: {m2}");
+
+  // References are non-owning pointers, because they do not own the data they point to.
+
+}
+
+fn greet(g1: &String, g2: &String) { 
+  // g1 and g2 are references to m1 and m2 on the stack, m1 and m2 point to actual data
+  println!("{g1} {g2}");
 }
 
 fn make_greeting(mut name: String) -> String {
