@@ -97,9 +97,33 @@ fn main() {
 
   // References are non-owning pointers, because they do not own the data they point to.
 
+  // Dereferencing a pointer allows us to access its data.
+  // Note, if we are dereferencing a "reference" then the value obtained is the
+  // original reference.
+  // There can be multiple chained/hierarchical references (or reference of reference)
+  let s1 = String::from("Hello");
+  let r1 = &s1; // immutable reference of s1
+  let r2 = &r1; // immutable reference of r1 (reference of reference).
+  let _r3 = &*r1; // destructures reference first to get String and references that
+
+  println!("s1: {s1}");
+  println!("Destructuring once, s1: {}", *r1);
+  println!("Destructuring twice, s1: {}", **r2);
+
+  // calling a method with dot operator in some cases means implicit dereference
+  let x = Box::new(-1);
+  let s1 = String::from("World");
+  println!("Abs of x: {}", i32::abs(*x)); // explicit dereference
+  println!("Abs of x: {}", x.abs()); // implicit dereference
+  println!("Length of s1: {}", str::len(&s1));
+  println!("Length of s1: {}", s1.len());
+
+  let x = Box::new(0);
+  let y = Box::new(&x);
+  println!("{}", *y);
 }
 
-fn greet(g1: &String, g2: &String) { 
+fn greet(g1: &String, g2: &String) { // &String means a reference to a String
   // g1 and g2 are references to m1 and m2 on the stack, m1 and m2 point to actual data
   println!("{g1} {g2}");
 }
