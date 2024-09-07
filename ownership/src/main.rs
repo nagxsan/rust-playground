@@ -121,7 +121,46 @@ fn main() {
   let x = Box::new(0);
   let y = Box::new(&x);
   println!("{}", *y);
+
+  // Aliasing (referencing) along with mutation is extremely dangerous. Cases:
+  // - By deallocating the aliased data, leaving the other variable to point to deallocated memory.
+  // - By mutating the aliased data, invalidating runtime properties expected by the other variable.
+  // - By concurrently mutating the aliased data, causing a data race with nondeterministic behavior for the other variable.
+
+  let mut v = vec![1,2,3]; // Len:3, Cap: 3
+  v.push(4); // Len: 4, Cap: 6
+  // When the vector is at capacity and a new element is pushed, then the vector
+  // doubles its capacity, copies all the elements, moves them (maybe)
+  // to a new location and deallocates original vector in the heap.
+
+  let mut v = vec![1];
+  let num = &v[0];
+  // v.push(2);
+  println!("{}", *num);
+  // num is an immutable borrow of vector v. Now if we attempt to perform the
+  // `push` operation, that is an implicit mutable borrow of vector v. This is not
+  // allowed and the code would not compile.
+
+  // There can be multiple immutable borrows of a variable (given no mutable borrow).
+  // There can only be a single mutable borrow of a variable. IF there is a mutable
+  // borrow for a variable, then no immutable borrows are allowed.
+  // While a borrow is active, ownership for the borrowed variable cannot change
+
+  // Data can be aliased. Data can be mutated. But data cannot be both aliased and mutated
+
 }
+
+// This function won't compile because Rust does not know if the output reference (&String) is
+// coming from `strings` or `default`. Therefore Rust would not know which variable
+// in the caller function can be moved/written and this is not allowed.
+// fn first_or(strings: &Vec<String>, default: &String) -> &String {
+//   if strings.len() > 0 {
+//       &strings[0]
+//   } else {
+//       default
+//   }
+// }
+// Use Lifetime Parameters for this
 
 fn greet(g1: &String, g2: &String) { // &String means a reference to a String
   // g1 and g2 are references to m1 and m2 on the stack, m1 and m2 point to actual data
